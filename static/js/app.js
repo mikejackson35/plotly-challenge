@@ -1,8 +1,8 @@
-// Grab onto drop down
+// Connect dropdown
 var selection = d3.select("#selDataset");
 var rawJson
 
-// Begin page load and working wtih data
+// Page load
 d3.json("samples.json").then(function(dataFromServer) {
     rawJson = dataFromServer;
     console.log(rawJson)
@@ -29,15 +29,6 @@ function chartBuilder() {
     var currentMetadata = rawMetadata.filter(person => person.id == currentId)[0]
 
     var demographic = d3.select('#sample-metadata')
-    // {} -> []
-    // .keys()/ .values() / .items()
-    /*
-    {"id": 1551, "ethnicity": "Caucasian", "gender": "M", "age": 26.0, "location": "NC", "bbtype": "I", "wfreq": 0.0
-    
-    [["id": 1551], ["ethnicity": "Caucasian"],]
-
-    for key, value in dictionary.items():
-    */
     demographic.html("");
 
     Object.entries(currentMetadata).forEach(([key, value])=> {
@@ -55,7 +46,7 @@ function chartBuilder() {
     var wfreqVar = currentMetadata.wfreq;
 
 
-    // Build demographics table
+    // demographics table
     d3.select("#age-td").text(ageVar);
     d3.select("#bbtype-td").text(bbVar);
     d3.select("#ethn-td").text(ethnVar);
@@ -65,9 +56,7 @@ function chartBuilder() {
     d3.select("#wfreq-td").text(wfreqVar);
 
 
-    // Create Bar Chart -----------------------------
-    // Build bar chart
-    // Define the dataset
+    // bar
     var barTrace = {
         y: currentSample.otu_ids.slice(0,10).map(id => `ID ${id}`),
         x: currentSample.sample_values.slice(0,10),
@@ -77,22 +66,21 @@ function chartBuilder() {
         text: currentSample.otu_labels.slice(0,10),
     }
 
-    // Define the layout
+    // layout
     var barLayout = {
-        title: "Count of Highest 10 OTUs per Sample (bar)",
+        title: "10 Highest OTUs per Sample",
         xaxis:{title: "OTU ID No.", type: "category"},
         yaxis:{title: "Count in Sample"}
     }
 
-    // Define the datasets to plot
+    // data to plot
     var barData = [barTrace]
 
     var responsive = { "responsive":true};
     // Plot data
     Plotly.newPlot("bar", barData, barLayout, responsive)
 
-    // -------------------------------------------------
-    // Create Bubble Chart -----------------------------
+    // Bubble
     var bubbleTrace = {
         x: currentSample.otu_ids,
         y: currentSample.sample_values,
@@ -103,13 +91,13 @@ function chartBuilder() {
             color: currentSample.otu_ids,
             colorscale: 'Jet'
         },
-        name: "Bacteria (Bubble size reflects count)"
+        name: "Bacteria (Larger Bubble = Higher Count!)"
     };
 
     var bubbleData = [bubbleTrace];
 
     var bubbleLayout = {
-        title: "Count of Highest 10 OTUs per Sample (bubble)",
+        title: "10 Highest OTUs per Sample",
         showlegend: true,
         xaxis: {title:{text:"OTU ID No."}},
         yaxis: {title:{text:"Count in Sample"}},
@@ -117,8 +105,7 @@ function chartBuilder() {
 
     Plotly.newPlot('bubble', bubbleData, bubbleLayout, responsive);
 
-    // -------------------------------------------
-    // Create Gauge Chart -----------------------------
+    // Gauge
     var gaugeData = [
         {
             domain: { x: [0, 1], y: [0, 1] },
